@@ -1,0 +1,7 @@
+{
+  "name": "computer-institution-management",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  }
+}
