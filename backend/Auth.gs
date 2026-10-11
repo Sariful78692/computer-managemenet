@@ -35,6 +35,46 @@ function createAdminUser(email, password, name) {
   });
 }
 
+function resetAppPassword(email, password) {
+  let ui;
+  if (!email) {
+    ui = SpreadsheetApp.getUi();
+    const emailReply = ui.prompt('Reset application password', 'Enter the application user email:', ui.ButtonSet.OK_CANCEL);
+    if (emailReply.getSelectedButton() !== ui.Button.OK) return 'Password reset cancelled.';
+    email = emailReply.getResponseText();
+  }
+  if (!password) {
+    if (!ui) ui = SpreadsheetApp.getUi();
+    const passwordReply = ui.prompt('Reset application password', 'Enter a new password (at least 12 characters):', ui.ButtonSet.OK_CANCEL);
+    if (passwordReply.getSelectedButton() !== ui.Button.OK) return 'Password reset cancelled.';
+    password = passwordReply.getResponseText();
+  }
+
+  email = String(email || '').trim().toLowerCase();
+  password = String(password || '');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Enter a valid application user email.');
+  if (password.length < 12) throw new Error('New password must be at least 12 characters.');
+
+  return withDatabaseLock_(function () {
+    const user = getRecords_('Users').find(function (row) {
+      return String(row.Email).toLowerCase() === email && row.Status === 'Active';
+    });
+    if (!user) throw new Error('No active application user was found for that email. Run createAdminUser() if no admin account exists.');
+    updateRecord_('Users', 'UserID', user.UserID, {
+      PasswordHash: hashPassword_(password),
+      LastLogin: ''
+    });
+    audit_(
+      { UserID: user.UserID, Name: 'Apps Script owner' },
+      'PASSWORD_RESET',
+      'Users',
+      user.UserID,
+      { Email: user.Email }
+    );
+    return 'Password reset successfully. Sign in to the web app using this application email and the new password.';
+  });
+}
+
 function login(email, password) {
   email = String(email || '').trim().toLowerCase();
   password = String(password || '');

@@ -131,6 +131,19 @@ After this connection, every push to GitHub's `main` branch starts a Vercel prod
 
 The browser calls the same-origin `/api/gas-api` Vercel function; that function forwards requests to Apps Script. This avoids exposing the Apps Script URL in frontend source and avoids browser CORS configuration.
 
+### If application login says the email or password is incorrect
+
+The app login is separate from Google sign-in. Use the app user created with `createAdminUser()` and the password entered in that function; do not use the Google account password unless you deliberately made them identical.
+
+To reset an existing active app user's password:
+
+1. Update the backend code in Apps Script with the latest combined `dist/Code.gs` (run `npm.cmd run build`, then copy all of `dist/Code.gs` into the spreadsheet-bound Apps Script `Code.gs`).
+2. Save and deploy a new version: **Deploy → Manage deployments → Edit → New version → Deploy**.
+3. In the Apps Script function selector select `resetAppPassword`, then click **Run**. Enter the app user's email and a new password of at least 12 characters in the prompts.
+4. Return to the Vercel app and sign in using that exact app email and new password. Do not send the password in chat or put it in source files.
+
+If no app user has been created yet, run `createAdminUser()` instead. The user must be Active; the reset function deliberately does not reactivate disabled accounts.
+
 ## When you change code
 
 - Edit server-side logic in `backend/`.
