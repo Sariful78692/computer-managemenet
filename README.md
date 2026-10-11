@@ -71,6 +71,38 @@ The Apps Script web-app endpoint must accept unauthenticated HTTP requests so Ve
 
 ## Part 3 — push to GitHub and connect Vercel
 
+### Test locally first
+
+1. From the project folder build the static site:
+
+   ```powershell
+   npm.cmd run build
+   ```
+
+2. Install the Vercel CLI dependency from the project:
+
+   ```powershell
+   npm.cmd install
+   ```
+
+3. Set the Apps Script endpoint in the current PowerShell window. This keeps the URL out of source and GitHub:
+
+   ```powershell
+   $env:GAS_WEB_APP_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec"
+   ```
+
+   Replace the example URL with your deployed Apps Script `/exec` URL. You can use the endpoint you already provided.
+4. Start the local Vercel server:
+
+   ```powershell
+   npx.cmd vercel dev --local --listen 3000
+   ```
+
+5. Open `http://localhost:3000`. Sign in using the admin email/password created with `createAdminUser()` in Apps Script. Test by adding sample data first.
+6. To stop the local server press **Ctrl+C**. The environment variable is only set in that PowerShell window; set it again in a new terminal.
+
+If the local API says the endpoint is not configured, confirm `GAS_WEB_APP_URL` was set in the same PowerShell window, then restart `npx.cmd vercel dev --local --listen 3000`.
+
 1. On GitHub, create a new empty repository. Do not initialize it with a README, license, or GitHub-generated `.gitignore`.
 2. In VS Code Terminal, run these commands from the project folder:
 

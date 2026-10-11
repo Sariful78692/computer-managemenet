@@ -3,5 +3,8 @@
   "private": true,
   "scripts": {
     "build": "node build.js"
+  },
+  "devDependencies": {
+    "vercel": "^63.1.2"
   }
 }
